@@ -3,7 +3,7 @@
 repo="https://github.com/voxpupuli/puppet-collectd"
 ref=""
 
-VPCI_ROOT=~/vcpi
+VPCI_ROOT=~/vpci
 
 ${VPCI_ROOT}/scripts/allow_local_ssh_root
 ${VPCI_ROOT}/scripts/clone_repo $repo $ref
