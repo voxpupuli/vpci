@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Apache 2
+# (c) IBM
+
+# Writes a nodeset file for beaker to use
+
+if [ -x /usr/bin/apt-get ]; then
+
+cat > spec/acceptance/nodesets/localssh.yml <<EOF
+HOSTS:
+  ubuntu-14.04-amd64:
+    roles:
+      - master
+    platform: ubuntu-14.04-amd64
+    hypervisor: none
+    ip: 127.0.0.1
+CONFIG:
+  type: foss
+  set_env: false
+EOF
+
+else
+
+cat > spec/acceptance/nodesets/localssh.yml <<EOF
+HOSTS:
+  centos-70-x64:
+    roles:
+      - master
+    platform: el-7-x86_64
+    hypervisor: none
+    ip: 127.0.0.1
+CONFIG:
+  type: foss
+  set_env: false
+EOF
+fi
