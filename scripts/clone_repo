@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Apache 2
+# (c) IBM
+
+git_repo=$1
+ref=$2
+
+dir=`echo $git_repo | awk -F'/' '{print $NF}'`
+
+git clone $git_repo $dir
+
+if [ -z $ref ]; then
+    cd $dir
+    git checkout $ref
+    cd -
+fi
