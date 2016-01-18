@@ -3,4 +3,4 @@
 # Apache 2
 # (c) IBM
 
-sudo apt-get install build-essential patch ruby-dev zlib1g-dev liblzma-dev
+sudo apt-get install -y build-essential patch ruby-dev zlib1g-dev liblzma-dev
