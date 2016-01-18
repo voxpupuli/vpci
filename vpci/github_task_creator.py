@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from datetime import datetime
+import time
 
 from github import Github, UnknownObjectException
 import json
@@ -24,18 +25,14 @@ def init_db_or_pass(conn):
     # Save (commit) the changes
     try:
         c.execute("SELECT * FROM pull_requests LIMIT 1")
+        for row in c.execute("SELECT * FROM pull_requests"):
+            print row
         return
     except sqlite3.OperationalError:
         c.execute('''CREATE TABLE pull_requests
-                             (name text, merge_commit_sha text, number integer)''')
+                             (id INTEGER PRIMARY KEY ASC, name text, number integer, merge_commit_sha text)''')
 
     conn.commit()
-    print c.execute("SELECT * FROM pull_requests")
-
-
-
-
-
 
 
 def totimestamp(dt, epoch=datetime(1970, 1, 1)):
@@ -43,52 +40,58 @@ def totimestamp(dt, epoch=datetime(1970, 1, 1)):
     # return td.total_seconds()
     return int((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 1e6 )
 
-def orig():
 
-    repos = config.repos
+def scan_and_update(repos, db):
 
     for repo in repos:
-        r.sadd('repos', str(repo))
-        # from pdb import set_trace; set_trace()
+        #r.sadd('repos', str(repo)) #TODO reflect in DB maybe
         pulls = g.get_repo(repo).get_pulls()
+        print "repo is: {0}".format(repo)
+        print "pulls are: ",
+        for p in pulls:
+            print p.number,
 
         for pull in pulls:
+            number = pull.number
+            name = repo
             # from pdb import set_trace; set_trace()
-            unique_name = repo + "/" + str(pull.number)
-            current_merge_commit_sha = pull.merge_commit_sha
-            raw = r.get(unique_name)
+            unique_name = repo + "/" + str(number)
 
-            print raw
-            if raw is None:
-                stored_pull = {}
-                stored_pull['merge_commit_sha'] = ''
-                stored_pull['name'] = unique_name
-                stored_pull['number'] = str(pull.number)
-                stored_pull['time'] = str(datetime.now())
-            else:
-                stored_pull = json.loads(raw)
-
-            merge_commit_sha = stored_pull['merge_commit_sha']
             print unique_name
-            print merge_commit_sha
-            print current_merge_commit_sha
-            if merge_commit_sha != current_merge_commit_sha:
-                stored_pull['merge_commit_sha'] = current_merge_commit_sha
-                job = {}
-                job['unique_name'] = unique_name
+            current_merge_commit_sha = pull.merge_commit_sha
+            if current_merge_commit_sha is None:
+                current_merge_commit_sha = ""
+            cursor = db.cursor()
+            current = cursor.execute("SELECT * FROM pull_requests WHERE name=? and number =?", (name, number)).fetchall()
 
-                try:
-                  pcci_file = yaml.load(g.get_repo(repo).get_contents('.pcci.yml'))
-                  os_sets = []
-                  os_sets.append(pcci_file['nodesets'])
-                except UnknownObjectException,e:
-                  os_sets = ['trusty','centos7']
+            if current == []:
+                cursor.execute('INSERT INTO pull_requests values (NULL,?,?,?)', (name, number, current_merge_commit_sha))
+                db.commit()
 
-                for os_set in os_sets:
-                    job['nodeset'] = os_set
-                    r.rpush('todo', json.dumps(job))
 
-            r.set(unique_name, json.dumps(stored_pull))
+
+def derp():
+    merge_commit_sha = stored_pull['merge_commit_sha']
+    print unique_name
+    print merge_commit_sha
+    print current_merge_commit_sha
+    if merge_commit_sha != current_merge_commit_sha:
+        stored_pull['merge_commit_sha'] = current_merge_commit_sha
+        job = {}
+        job['unique_name'] = unique_name
+
+        try:
+          pcci_file = yaml.load(g.get_repo(repo).get_contents('.pcci.yml'))
+          os_sets = []
+          os_sets.append(pcci_file['nodesets'])
+        except UnknownObjectException,e:
+          os_sets = ['trusty','centos7']
+
+        for os_set in os_sets:
+            job['nodeset'] = os_set
+            r.rpush('todo', json.dumps(job))
+
+    r.set(unique_name, json.dumps(stored_pull))
 
 
 if __name__ == "__main__":
@@ -107,3 +110,5 @@ if __name__ == "__main__":
 
     conn = sqlite3.connect(db_file)
     init_db_or_pass(conn)
+
+    scan_and_update(conf['repos'], conn)
