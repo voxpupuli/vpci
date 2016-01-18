@@ -13,5 +13,5 @@ ${VPCI_ROOT}/scripts/clone_repo $repo $ref
 cd $repodir
 
 ${VPCI_ROOT}/scripts/checkout_pr $pr
-${VPCI_ROOT}/scripts/write_nodeset
+cp spec/acceptance/nodesets/default.yml spec/acceptance/nodesets/localssh.yml
 ${VPCI_ROOT}/scripts/run_beaker_rspec
