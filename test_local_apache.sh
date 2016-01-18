@@ -10,6 +10,7 @@ export BEAKER_TESTMODE=local
 
 ${VPCI_ROOT}/scripts/allow_local_ssh_root
 ${VPCI_ROOT}/scripts/clone_repo $repo $ref
+${VPCI_ROOT}/scripts/beaker_prepare
 cd $repodir
 
 ${VPCI_ROOT}/scripts/checkout_pr $pr
