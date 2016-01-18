@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Checkout a specific github pull request
+# (c) IBM 2016
+
+id=$1;
+if [ -z $id ]; then
+    echo "Need Pull request number as argument";
+    exit 1;
+fi;
+git fetch origin pull/${id}/head:pr_${id};
+git checkout pr_${id}
