@@ -13,5 +13,6 @@ This is the second generation CI system for VoxPupuli. The first system, pcci, b
 
 * VPCI will use OpenStack nova for test builders.
 
+* VPCI will be made up of several smaller daemons that will be controlled by a userspace process manager.
 
 
