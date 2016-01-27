@@ -57,7 +57,6 @@ def scan_and_update(repos, db):
             # from pdb import set_trace; set_trace()
             unique_name = repo + "/" + str(number)
 
-            print unique_name
             current_merge_commit_sha = pull.merge_commit_sha
             if current_merge_commit_sha is None:
                 current_merge_commit_sha = ""
@@ -65,6 +64,7 @@ def scan_and_update(repos, db):
             current = cursor.execute("SELECT * FROM pull_requests WHERE name=? and number =?", (name, number)).fetchall()
 
             if current == []:
+                print "Discovered new pull request, adding"
                 cursor.execute('INSERT INTO pull_requests values (NULL,?,?,?)', (name, number, current_merge_commit_sha))
                 db.commit()
 
