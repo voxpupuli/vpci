@@ -25,9 +25,9 @@ def init_db_or_pass(conn):
     # Save (commit) the changes
     try:
         c.execute("SELECT * FROM pull_requests LIMIT 1")
-        for row in c.execute("SELECT * FROM pull_requests"):
-            print row
-        return
+#        for row in c.execute("SELECT * FROM pull_requests"):
+#            print row
+#        return
     except sqlite3.OperationalError:
         c.execute('''CREATE TABLE pull_requests
                              (id INTEGER PRIMARY KEY ASC, name text, number integer, merge_commit_sha text)''')
