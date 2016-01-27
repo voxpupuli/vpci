@@ -25,9 +25,9 @@ def init_db_or_pass(conn):
     # Save (commit) the changes
     try:
         c.execute("SELECT * FROM pull_requests LIMIT 1")
-#        for row in c.execute("SELECT * FROM pull_requests"):
-#            print row
-#        return
+        for row in c.execute("SELECT * FROM pull_requests"):
+            print row
+        return
     except sqlite3.OperationalError:
         c.execute('''CREATE TABLE pull_requests
                              (id INTEGER PRIMARY KEY ASC, name text, number integer, merge_commit_sha text)''')
@@ -61,12 +61,21 @@ def scan_and_update(repos, db):
             if current_merge_commit_sha is None:
                 current_merge_commit_sha = ""
             cursor = db.cursor()
-            current = cursor.execute("SELECT * FROM pull_requests WHERE name=? and number =?", (name, number)).fetchall()
-
-            if current == []:
+            selection = cursor.execute("SELECT merge_commit_sha FROM pull_requests WHERE name=? and number =?", (name, number)).fetchone()
+            if selection == None:
                 print "Discovered new pull request, adding"
                 cursor.execute('INSERT INTO pull_requests values (NULL,?,?,?)', (name, number, current_merge_commit_sha))
                 db.commit()
+                continue
+            else:
+                db_merge_commit_sha = selection[0]
+
+
+            if db_merge_commit_sha != current_merge_commit_sha:
+                print "Pull request has been updated, updating database"
+                cursor.execute('UPDATE pull_requests SET merge_commit_sha=? WHERE name=? AND number=?', (current_merge_commit_sha, name, number))
+            else:
+                print "Pull request unchanged"
 
 
 
