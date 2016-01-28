@@ -66,6 +66,7 @@ def scan_and_update(repos, db):
                 print "Discovered new pull request, adding"
                 cursor.execute('INSERT INTO pull_requests values (NULL,?,?,?)', (name, number, current_merge_commit_sha))
                 db.commit()
+                r.rpush('new_pull_requests', unique_name)
                 continue
             else:
                 db_merge_commit_sha = selection[0]
@@ -74,6 +75,8 @@ def scan_and_update(repos, db):
             if db_merge_commit_sha != current_merge_commit_sha:
                 print "Pull request has been updated, updating database"
                 cursor.execute('UPDATE pull_requests SET merge_commit_sha=? WHERE name=? AND number=?', (current_merge_commit_sha, name, number))
+                db.commit()
+                r.rpush('new_pull_requests', unique_name)
             else:
                 print "Pull request unchanged"
 
