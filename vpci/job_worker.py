@@ -2,10 +2,16 @@
 
 import time
 import pprint
+import uuid
 
 import json
 import redis
 import yaml
+import shade
+import paramiko
+
+server_name = 'ubuntu 14.04 server'
+keypair_name = 'vpci'
 
 job_format = {
     'format_vers': 0.1,
@@ -24,6 +30,24 @@ job_format = {
         'noop',
     ],
 }
+
+def build_vm():
+
+    # set env vars and build vm
+    image = cloud.get_image(image_name)
+    key = cloud.search_keypairs(name_or_id=keypair_name)
+    server_name = "vpci-testnode-" + str(uuid.uuid4())
+    cloud.create_server(server_name, image['id'], flavor['id'], key_name=key[0]['id'])
+    server = cloud.get_server(server_name)
+
+    # poll until the node comes up
+    while True:
+        print "HODOR, cloud slow"
+        time.sleep(2)
+        server = cloud.get_server(server_name)
+        if len(server.addresses) > 0:
+            break
+
 
 def run_job():
     job = r.lpop('vpci_job_queue')
