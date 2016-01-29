@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Noop Job"
+echo "Failure!"
+echo "FAIL"
