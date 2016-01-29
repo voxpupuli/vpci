@@ -52,20 +52,35 @@ def build_vm():
     return server
 
 
-def logline(line):
-    global all_output
-    all_output += line
-    all_output += '\n'
-    print line
+class Remote():
+
+    def __init__(self, client, environment_hash):
+        self.client = client
+        self.environment_hash = environment_hash
+        self.all_output = ""
+        env_header = "export"
+        for k,v in self.environment_hash.iteritems():
+            env_header +=" {0}={1}".format(k,v)
+        env_header += "; "
+        self.environment_string = env_header
+        print "Running all commands with enviroment:"
+        print self.environment_string
 
 
-def run_and_print(client, command):
-    stdin, stdout, stderr = client.exec_command(command, get_pty=True)
-    logline("command: {0}".format(command))
-    logline("stdout: {0}".format(stdout.read().strip()))
-    err = stderr.read()
-    if err  != "":
-        logline("stderr: {0}".format(err))
+    def run_and_print(self, command):
+        cmd = self.environment_string + command
+        stdin, stdout, stderr = self.client.exec_command(cmd)
+        self.logline("command: {0}".format(command))
+        self.logline("stdout: {0}".format(stdout.read().strip()))
+        err = stderr.read()
+        if err  != "":
+            self.logline("stderr: {0}".format(err))
+
+
+    def logline(self, line):
+        self.all_output += line
+        self.all_output += '\n'
+        print line
 
 
 def create_ssh_client(server):
@@ -81,42 +96,46 @@ def create_ssh_client(server):
     return client
 
 
-def basic_information(client):
+def basic_information(remote):
     # collect basic node information
-    run_and_print(client, 'pwd')
-    run_and_print(client, 'hostname')
-    run_and_print(client, 'cat /etc/issue')
-    run_and_print(client, 'nproc')
+    remote.run_and_print('pwd')
+    remote.run_and_print('hostname')
+    remote.run_and_print('cat /etc/issue')
+    remote.run_and_print('nproc')
 
 
-def setup_node(client):
+def local_setup_node(remote):
     # perform setup tasks
-    run_and_print(client, 'rm -fr vpci')
-    run_and_print(client, 'git clone git://192.168.122.1/voxpupuli/vpci/.git')
-    run_and_print(client, 'ls vpci/jobs')
+    remote.run_and_print('rm -fr vpci')
+    remote.run_and_print('git clone git://192.168.122.1/voxpupuli/vpci/.git')
+    remote.run_and_print('ls vpci/jobs')
 
 
 def run_job():
     #job = r.lpop('vpci_job_queue')
     job = r.lindex('vpci_job_queue', 1)
     if job == None:
-        logline("No work to do")
+        print "No work to do"
         return
     job = json.loads(job)
 
-    logline("Working on job")
+    print "Working on job"
     pp.pprint(job)
 
     #server = build_vm()
     server = {}
     client = create_ssh_client(server)
 
-    basic_information(client)
-    setup_node(client)
+
+    remote = Remote(client, job['environment'])
+
+    basic_information(remote)
+    local_setup_node(remote)
+
+    remote.run_and_print("echo $CI_SYSTEM")
 
 
 if __name__ == "__main__":
-    global all_output
     all_output = ""
     pp = pprint.PrettyPrinter(indent=4)
 
