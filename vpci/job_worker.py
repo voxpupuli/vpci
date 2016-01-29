@@ -48,9 +48,50 @@ def build_vm():
         if len(server.addresses) > 0:
             break
 
+    return server
+
+def run_and_print(client, command):
+    stdin, stdout, stderr = client.exec_command(command)
+    print "command: ", command
+    print "stdout: ", stdout.read().strip()
+    err = stderr.read()
+    if err  != "":
+        print "stderr: ", err
+
 
 def run_job():
-    job = r.lpop('vpci_job_queue')
+    #job = r.lpop('vpci_job_queue')
+    job = r.lindex('vpci_job_queue', 1)
+    if job == None:
+        print "No work to do"
+        return
+    print "Working on job"
+    job = json.loads(job)
+    pp.pprint(job)
+    #server = build_vm()
+
+    # All this is custom for testing
+    ip = '192.168.122.17'
+    #
+
+    # Initialize paramiko for SSH
+    client = paramiko.client.SSHClient()
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(ip, username='ubuntu', look_for_keys=False, key_filename=conf['ssh_private_key'])
+
+    # collect basic node information
+    run_and_print(client, 'pwd')
+    run_and_print(client, 'hostname')
+    run_and_print(client, 'cat /etc/issue')
+    run_and_print(client, 'nproc')
+    run_and_print(client, 'free -m')
+
+
+    # perform setup tasks
+    run_and_print(client, 'rm -fr vpci')
+    run_and_print(client, 'git clone git://192.168.122.1/voxpupuli/vpci/.git')
+    run_and_print(client, 'ls vpci/jobs')
 
 
 if __name__ == "__main__":
