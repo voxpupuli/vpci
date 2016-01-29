@@ -69,8 +69,8 @@ class Remote():
 
     def run_and_print(self, command):
         cmd = self.environment_string + command
-        stdin, stdout, stderr = self.client.exec_command(cmd)
         self.logline("command: {0}".format(command))
+        stdin, stdout, stderr = self.client.exec_command(cmd)
         self.logline("stdout: {0}".format(stdout.read().strip()))
         err = stderr.read()
         if err  != "":
