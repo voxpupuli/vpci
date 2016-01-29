@@ -32,8 +32,14 @@ def process_haproxy(org, name, number):
     job['name'] = name
     job['number'] = number
     job['slug'] = org + '/' + name
+    job['jobs'].append('experiments/long_running_fail')
+    job['jobs'].append('experiments/long_running_success')
+    job['jobs'].append('experiments/simple_fail')
+    job['jobs'].append('experiments/simple_success')
+
     pp.pprint(job)
     r.rpush('vpci_job_queue', json.dumps(job))
+
 
 def process_puppet_core(org, name, number):
     return

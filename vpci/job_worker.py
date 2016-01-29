@@ -54,10 +54,11 @@ def build_vm():
 
 class Remote():
 
-    def __init__(self, client, environment_hash):
+    def __init__(self, client, environment_hash, timeout=30):
         self.client = client
         self.environment_hash = environment_hash
         self.all_output = ""
+        self.timeout = timeout
         env_header = "export"
         for k,v in self.environment_hash.iteritems():
             env_header +=" {0}={1}".format(k,v)
@@ -71,10 +72,27 @@ class Remote():
         cmd = self.environment_string + command
         self.logline("command: {0}".format(command))
         stdin, stdout, stderr = self.client.exec_command(cmd)
-        self.logline("stdout: {0}".format(stdout.read().strip()))
+
+        out = stdout.read().strip()
+        self.logline("stdout: {0}".format(out.strip()))
         err = stderr.read()
         if err  != "":
             self.logline("stderr: {0}".format(err))
+            return out,err
+        return out
+
+    def test_job(self, job_name):
+        out = self.run_and_print("./vpci/jobs/{0}".format(job_name))
+        if out[-4:] == 'FAIL':
+            print "failed"
+            return False
+        if out[-4:] == 'PASS':
+            print "success"
+            return True
+        else:
+            print "Output undetected: {0}".format(out[-4:])
+
+
 
 
     def logline(self, line):
@@ -115,7 +133,7 @@ def local_setup_node(remote):
 
 def run_job():
     #job = r.lpop('vpci_job_queue')
-    job = r.lindex('vpci_job_queue', 1)
+    job = r.lindex('vpci_job_queue', 0)
     if job == None:
         print "No work to do"
         return
@@ -134,16 +152,21 @@ def run_job():
     basic_information(remote)
     local_setup_node(remote)
 
+    results_hash = {}
     print "This test will run the following jobs: "
     for job_script in job['jobs']:
         print job_script,
+        results_hash[job_script] = ""
     print
     print
 
     for job_script in job['jobs']:
         print "Running Job", job_script
-        remote.run_and_print("./vpci/jobs/{0}".format(job_script))
+        success = remote.test_job(job_script)
+        results_hash[job_script] = success
     print
+
+    pp.pprint(results_hash)
 
 
 if __name__ == "__main__":
