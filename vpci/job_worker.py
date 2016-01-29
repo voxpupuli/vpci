@@ -58,6 +58,18 @@ def run_and_print(client, command):
     if err  != "":
         print "stderr: ", err
 
+def create_ssh_client(server):
+    # All this is custom for testing
+    ip = '192.168.122.17'
+    #
+    # Initialize paramiko for SSH
+    client = paramiko.client.SSHClient()
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(ip, username='ubuntu', look_for_keys=False, key_filename=conf['ssh_private_key'])
+    return client
+
+
 
 def run_job():
     #job = r.lpop('vpci_job_queue')
@@ -65,20 +77,14 @@ def run_job():
     if job == None:
         print "No work to do"
         return
-    print "Working on job"
     job = json.loads(job)
+
+    print "Working on job"
     pp.pprint(job)
+
     #server = build_vm()
+    client = create_ssh_client(server)
 
-    # All this is custom for testing
-    ip = '192.168.122.17'
-    #
-
-    # Initialize paramiko for SSH
-    client = paramiko.client.SSHClient()
-    client.load_system_host_keys()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(ip, username='ubuntu', look_for_keys=False, key_filename=conf['ssh_private_key'])
 
     # collect basic node information
     run_and_print(client, 'pwd')
