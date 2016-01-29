@@ -39,6 +39,7 @@ def build_vm():
     cloud = shade.openstack_cloud(name='yolocloud')
     image = cloud.get_image(image_name)
     key = cloud.search_keypairs(name_or_id=keypair_name)
+    flavor = cloud.get_flavor_by_ram(1000)
     server_name = "vpci-testnode-" + str(uuid.uuid4())
     cloud.create_server(server_name, image['id'], flavor['id'], key_name=key[0]['id'])
     server = cloud.get_server(server_name)
