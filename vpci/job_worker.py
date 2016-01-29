@@ -31,6 +31,7 @@ job_format = {
     ],
 }
 
+
 def build_vm():
 
     # set env vars and build vm
@@ -50,16 +51,26 @@ def build_vm():
 
     return server
 
+
+def logline(line):
+    global all_output
+    all_output += line
+    all_output += '\n'
+    print line
+
+
 def run_and_print(client, command):
     stdin, stdout, stderr = client.exec_command(command)
-    print "command: ", command
-    print "stdout: ", stdout.read().strip()
+    logline("command: {0}".format(command))
+    logline("stdout: {0}".format(stdout.read().strip()))
     err = stderr.read()
     if err  != "":
-        print "stderr: ", err
+        logline("stderr: {0}".format(err))
+
 
 def create_ssh_client(server):
     # All this is custom for testing
+    # TODO fix it up to use shade
     ip = '192.168.122.17'
     #
     # Initialize paramiko for SSH
@@ -70,19 +81,19 @@ def create_ssh_client(server):
     return client
 
 
-
 def run_job():
     #job = r.lpop('vpci_job_queue')
     job = r.lindex('vpci_job_queue', 1)
     if job == None:
-        print "No work to do"
+        logline("No work to do")
         return
     job = json.loads(job)
 
-    print "Working on job"
+    logline("Working on job")
     pp.pprint(job)
 
     #server = build_vm()
+    server = {}
     client = create_ssh_client(server)
 
 
@@ -101,6 +112,8 @@ def run_job():
 
 
 if __name__ == "__main__":
+    global all_output
+    all_output = ""
     pp = pprint.PrettyPrinter(indent=4)
 
     with open('config.yaml') as f:
@@ -109,5 +122,6 @@ if __name__ == "__main__":
 
     r = redis.StrictRedis(host='localhost', port=6379, db=0)
     run_job()
+    #print all_output
 
 
