@@ -60,7 +60,7 @@ def logline(line):
 
 
 def run_and_print(client, command):
-    stdin, stdout, stderr = client.exec_command(command)
+    stdin, stdout, stderr = client.exec_command(command, get_pty=True)
     logline("command: {0}".format(command))
     logline("stdout: {0}".format(stdout.read().strip()))
     err = stderr.read()
