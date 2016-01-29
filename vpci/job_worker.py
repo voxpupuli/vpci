@@ -105,10 +105,10 @@ def create_ssh_client(server):
     # All this is custom for testing
     # TODO fix it up to use shade
     ip = '192.168.122.17'
-    if server.addresses['public'][0]['version'] == 6:
-        ip = server.addresses['public'][0]['addr']
+    if server.addresses['external'][0]['version'] == 6:
+        ip = server.addresses['external'][0]['addr']
     else:
-        ip = server.addresses['public'][1]['addr']
+        ip = server.addresses['external'][1]['addr']
     #
     # Initialize paramiko for SSH
     client = paramiko.client.SSHClient()
