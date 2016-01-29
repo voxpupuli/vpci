@@ -52,6 +52,8 @@ def build_vm():
         if len(server.addresses) > 0:
             break
 
+    print "server created, sleeping 2 minutes for it to boot"
+    time.sleep(120)
     return server
 
 
