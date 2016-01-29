@@ -84,10 +84,8 @@ class Remote():
     def test_job(self, job_name):
         out = self.run_and_print("./vpci/jobs/{0}".format(job_name))
         if out[-4:] == 'FAIL':
-            print "failed"
             return False
         if out[-4:] == 'PASS':
-            print "success"
             return True
         else:
             print "Output undetected: {0}".format(out[-4:])
