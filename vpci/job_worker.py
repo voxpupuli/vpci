@@ -133,7 +133,8 @@ def basic_information(remote):
 def local_setup_node(remote):
     # perform setup tasks
     remote.run_and_print('rm -fr vpci')
-    remote.run_and_print('git clone git://192.168.122.1/voxpupuli/vpci/.git')
+    remote.run_and_print('sudo apt-get update; sudo apt-get install -y git')
+    remote.run_and_print('git clone https://github.com/voxpupuli/vpci')
     remote.run_and_print('ls vpci/jobs | wc -l')
 
 
@@ -173,7 +174,7 @@ def run_job():
     print
 
     pp.pprint(results_hash)
-
+    server.delete_server()
 
 if __name__ == "__main__":
     all_output = ""
