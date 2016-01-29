@@ -102,6 +102,10 @@ def create_ssh_client(server):
     # All this is custom for testing
     # TODO fix it up to use shade
     ip = '192.168.122.17'
+    if server.addresses['public'][0]['version'] == 6:
+        ip = server.addresses['public'][0]['addr']
+    else:
+        ip = server.addresses['public'][1]['addr']
     #
     # Initialize paramiko for SSH
     client = paramiko.client.SSHClient()
@@ -139,8 +143,8 @@ def run_job():
     print "Working on job"
     pp.pprint(job)
 
-    #server = build_vm()
-    server = {}
+    server = build_vm()
+    #server = {}
     client = create_ssh_client(server)
 
 
