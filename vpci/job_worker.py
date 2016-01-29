@@ -102,6 +102,8 @@ def basic_information(remote):
     remote.run_and_print('hostname')
     remote.run_and_print('cat /etc/issue')
     remote.run_and_print('nproc')
+    remote.run_and_print("env")
+    remote.run_and_print("echo $CI_SYSTEM")
 
 
 def local_setup_node(remote):
@@ -132,7 +134,9 @@ def run_job():
     basic_information(remote)
     local_setup_node(remote)
 
-    remote.run_and_print("echo $CI_SYSTEM")
+    for job_script in job['jobs']:
+        print job_script
+
 
 
 if __name__ == "__main__":
