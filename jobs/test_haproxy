@@ -11,3 +11,10 @@ ${VPCI_ROOT}/scripts/clone_repo $repo $ref
 cd puppetlabs-haproxy
 ${VPCI_ROOT}/scripts/write_nodeset
 ${VPCI_ROOT}/scripts/run_beaker_rspec
+ret=$?
+echo $ret
+if [ $ret -eq 0 ];then
+    echo 'PASS'
+else
+    echo 'FAIL'
+fi
