@@ -80,6 +80,18 @@ def create_ssh_client(server):
     client.connect(ip, username='ubuntu', look_for_keys=False, key_filename=conf['ssh_private_key'])
     return client
 
+def basic_information(client):
+    # collect basic node information
+    run_and_print(client, 'pwd')
+    run_and_print(client, 'hostname')
+    run_and_print(client, 'cat /etc/issue')
+    run_and_print(client, 'nproc')
+
+def setup_node(client):
+    # perform setup tasks
+    run_and_print(client, 'rm -fr vpci')
+    run_and_print(client, 'git clone git://192.168.122.1/voxpupuli/vpci/.git')
+    run_and_print(client, 'ls vpci/jobs')
 
 def run_job():
     #job = r.lpop('vpci_job_queue')
@@ -96,20 +108,8 @@ def run_job():
     server = {}
     client = create_ssh_client(server)
 
-
-    # collect basic node information
-    run_and_print(client, 'pwd')
-    run_and_print(client, 'hostname')
-    run_and_print(client, 'cat /etc/issue')
-    run_and_print(client, 'nproc')
-    run_and_print(client, 'free -m')
-
-
-    # perform setup tasks
-    run_and_print(client, 'rm -fr vpci')
-    run_and_print(client, 'git clone git://192.168.122.1/voxpupuli/vpci/.git')
-    run_and_print(client, 'ls vpci/jobs')
-
+    basic_information(client)
+    setup_node(client)
 
 if __name__ == "__main__":
     global all_output
