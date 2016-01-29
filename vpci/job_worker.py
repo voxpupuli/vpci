@@ -1,4 +1,7 @@
-#!/bin/bash
+# Utility to boot an openstack node
+# ssh in, configure
+# run some tests
+# report on status
 
 import time
 import pprint
