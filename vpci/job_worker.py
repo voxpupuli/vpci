@@ -10,7 +10,7 @@ import yaml
 import shade
 import paramiko
 
-server_name = 'ubuntu 14.04 server'
+image_name = 'ubuntu 14.04 server'
 keypair_name = 'vpci'
 
 job_format = {
@@ -35,6 +35,8 @@ job_format = {
 def build_vm():
 
     # set env vars and build vm
+    shade.simple_logging(debug=False)
+    cloud = shade.openstack_cloud(name=yolocloud)
     image = cloud.get_image(image_name)
     key = cloud.search_keypairs(name_or_id=keypair_name)
     server_name = "vpci-testnode-" + str(uuid.uuid4())
