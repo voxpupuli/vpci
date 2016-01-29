@@ -2,3 +2,5 @@ PyGithub
 PyYAML
 redis
 wheel
+shade
+paramiko
