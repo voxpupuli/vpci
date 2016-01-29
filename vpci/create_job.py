@@ -1,6 +1,8 @@
 # This script is used purely for development
 
 import pprint
+import redis
+import json
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -38,4 +40,5 @@ job['jobs'].append('experiments/simple_fail')
 job['jobs'].append('experiments/simple_success')
 
 pp.pprint(job)
-#r.rpush('vpci_job_queue', json.dumps(job))
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
+r.rpush('vpci_job_queue', json.dumps(job))
