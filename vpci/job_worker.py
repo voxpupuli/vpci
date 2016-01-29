@@ -36,7 +36,7 @@ def build_vm():
 
     # set env vars and build vm
     shade.simple_logging(debug=False)
-    cloud = shade.openstack_cloud(name=yolocloud)
+    cloud = shade.openstack_cloud(name='yolocloud')
     image = cloud.get_image(image_name)
     key = cloud.search_keypairs(name_or_id=keypair_name)
     server_name = "vpci-testnode-" + str(uuid.uuid4())
