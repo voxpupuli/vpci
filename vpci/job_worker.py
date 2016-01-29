@@ -110,7 +110,7 @@ def local_setup_node(remote):
     # perform setup tasks
     remote.run_and_print('rm -fr vpci')
     remote.run_and_print('git clone git://192.168.122.1/voxpupuli/vpci/.git')
-    remote.run_and_print('ls vpci/jobs')
+    remote.run_and_print('ls vpci/jobs | wc -l')
 
 
 def run_job():
@@ -134,9 +134,16 @@ def run_job():
     basic_information(remote)
     local_setup_node(remote)
 
+    print "This test will run the following jobs: "
     for job_script in job['jobs']:
-        print job_script
+        print job_script,
+    print
+    print
 
+    for job_script in job['jobs']:
+        print "Running Job", job_script
+        remote.run_and_print("./vpci/jobs/{0}".format(job_script))
+    print
 
 
 if __name__ == "__main__":
