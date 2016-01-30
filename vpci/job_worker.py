@@ -112,7 +112,7 @@ class Remote():
     def logline(self, line):
         self.all_output += line
         self.all_output += '\n'
-        if len(line) > 100:
+        if len(line) > 2000:
             tempdir = tempfile.mkdtemp()
             path = tempdir + '/' + 'output.log'
             with open(tempdir + '/' + 'output.log') as f:
