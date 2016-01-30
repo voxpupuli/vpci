@@ -3,6 +3,7 @@
 # run some tests
 # report on status
 
+import datetime
 import time
 import pprint
 import uuid
@@ -83,7 +84,11 @@ class Remote():
     def run_and_print(self, command):
         cmd = self.environment_string + command
         self.logline("command: {0}".format(command))
+        start = datetime.datetime.now()
         stdin, stdout, stderr = self.client.exec_command(cmd)
+        stop = datetime.datetime.now()
+        if (stop - start) > datetime.timedelta(seconds=10):
+            self.logline("execution took {0}".format(stop - start))
 
         out = stdout.read().strip()
         self.logline("stdout: {0}".format(out.strip()))
