@@ -98,7 +98,7 @@ class Remote():
         if err != "":
             self.logline("stderr: {0}".format(err))
             return out, err
-        return out
+        return out, err
 
     def test_job(self, job_name):
         out, err = self.run_and_print("./vpci/jobs/{0}".format(job_name))
