@@ -115,9 +115,6 @@ class Remote():
 
 
 def create_ssh_client(server):
-    # All this is custom for testing
-    # TODO fix it up to use shade
-    ip = '192.168.122.17'
     if server.addresses['external'][0]['version'] == 6:
         ip = server.addresses['external'][0]['addr']
     else:
@@ -127,8 +124,16 @@ def create_ssh_client(server):
     client = paramiko.client.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(ip, username='ubuntu', look_for_keys=False, key_filename=conf['ssh_private_key'])
-    return client
+    tries = 0
+    while tries <= 5:
+        try:
+            client.connect(ip, username='ubuntu', look_for_keys=False, key_filename=conf['ssh_private_key'])
+            return client
+        except:
+            print "Failed to connect, sleeping for sixty seconds"
+            time.sleep(60)
+            tries -= 1
+    raise paramiko.ssh_exception.NoValidConnectionsError
 
 
 def basic_information(remote):
