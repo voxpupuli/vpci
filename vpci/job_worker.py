@@ -115,7 +115,7 @@ class Remote():
         if len(line) > 2000:
             tempdir = tempfile.mkdtemp()
             path = tempdir + '/' + 'output.log'
-            with open(tempdir + '/' + 'output.log') as f:
+            with open(path, 'w') as f:
                 f.write(line)
             print "Wrote output to {0}".format(path)
         else:
