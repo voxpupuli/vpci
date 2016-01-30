@@ -59,6 +59,11 @@ def build_vm():
     time.sleep(120)
     return server
 
+def destroy_vm(server):
+    shade.simple_logging(debug=False)
+    cloud = shade.openstack_cloud(name='yolocloud')
+    cloud.delete_server(server.name)
+
 
 class Remote():
 
@@ -68,13 +73,12 @@ class Remote():
         self.all_output = ""
         self.timeout = timeout
         env_header = "export"
-        for k,v in self.environment_hash.iteritems():
-            env_header +=" {0}={1}".format(k,v)
+        for k, v in self.environment_hash.iteritems():
+            env_header += " {0}={1}".format(k, v)
         env_header += "; "
         self.environment_string = env_header
         print "Running all commands with enviroment:"
         print self.environment_string
-
 
     def run_and_print(self, command):
         cmd = self.environment_string + command
@@ -84,11 +88,10 @@ class Remote():
         out = stdout.read().strip()
         self.logline("stdout: {0}".format(out.strip()))
         err = stderr.read()
-        if err  != "":
+        if err != "":
             self.logline("stderr: {0}".format(err))
-            return out,err
+            return out, err
         return out
-
 
     def test_job(self, job_name):
         out = self.run_and_print("./vpci/jobs/{0}".format(job_name))
@@ -98,7 +101,6 @@ class Remote():
             return True
         else:
             print "Output undetected: {0}".format(out[-4:])
-
 
     def logline(self, line):
         self.all_output += line
@@ -156,7 +158,6 @@ def run_job():
     #server = {}
     client = create_ssh_client(server)
 
-
     remote = Remote(client, job['environment'])
 
     basic_information(remote)
@@ -177,7 +178,7 @@ def run_job():
     print
 
     pp.pprint(results_hash)
-    server.delete_server()
+    delete_vm()
 
 if __name__ == "__main__":
     all_output = ""
