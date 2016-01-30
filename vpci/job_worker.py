@@ -4,8 +4,9 @@
 # report on status
 
 import datetime
-import time
 import pprint
+import tempfile
+import time
 import uuid
 
 import json
@@ -111,7 +112,14 @@ class Remote():
     def logline(self, line):
         self.all_output += line
         self.all_output += '\n'
-        print line
+        if line.len() > 100:
+            tempdir = tempfile.mkdtemp()
+            path = tempdir + '/' + 'output.log'
+            with open(tempdir + '/' + 'output.log') as f:
+                f.write(line)
+            print "Wrote output to {0}".format(path)
+        else:
+            print line
 
 
 def create_ssh_client(server):
