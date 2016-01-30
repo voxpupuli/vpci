@@ -184,7 +184,7 @@ def run_job():
     print
 
     pp.pprint(results_hash)
-    delete_vm()
+    delete_vm(server)
 
 if __name__ == "__main__":
     all_output = ""
