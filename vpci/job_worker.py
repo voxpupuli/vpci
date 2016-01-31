@@ -63,7 +63,8 @@ def build_vm():
 
 
 def delete_vm(server):
-    shade.simple_logging(debug=False)
+    print "Deleting server {0}".format(server.name)
+    shade.simple_logging(debug=True)
     cloud = shade.openstack_cloud(name='yolocloud')
     cloud.delete_server(server.name)
 
